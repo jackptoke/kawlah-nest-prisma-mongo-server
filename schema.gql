@@ -1,0 +1,263 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Member status"""
+enum AccountStatus {
+  DEACTIVATED
+  NORMAL
+  RESTRICTED
+}
+
+type Article {
+  author: Member!
+  authorId: String!
+  blocks: [Block!]!
+  comments: [Comment!]!
+  createdAt: DateTime!
+  id: String!
+  publishedAt: DateTime!
+}
+
+type Block {
+  article: Article!
+  articleId: String!
+  blockId: String!
+  headerData: HeaderBlock
+  id: String!
+  imageData: ImageBlock
+  listData: ListBlock
+  paragraphData: ParagraphBlock
+  sequenceNo: Float!
+  tableData: TableBlock
+  type: BlockType!
+}
+
+"""The type of block"""
+enum BlockType {
+  DELIMITER
+  HEADER
+  IMAGE
+  LIST
+  PARAGRAPH
+  TABLE
+}
+
+type Comment {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateArticleInput {
+  authorId: String!
+  blocks: [InputBlockData!]!
+  publish: Boolean!
+}
+
+input CreateBlockInput {
+  articleId: String!
+  blockId: String!
+  headerData: InputHeaderData
+  id: String!
+  imageData: InputImageData
+  listData: InputListData
+  paragraphData: InputParagraphData
+  sequenceNo: Float!
+  tableData: InputTableData
+  type: BlockType!
+}
+
+input CreateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateMemberInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  username: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type HeaderBlock {
+  blockId: String!
+  id: String!
+  level: Int!
+  text: String!
+}
+
+type ImageBlock {
+  blockId: String!
+  caption: String!
+  filename: String!
+  id: String!
+  stretched: Boolean!
+  url: String!
+  withBackground: Boolean!
+  withBorder: Boolean!
+}
+
+input InputBlockData {
+  blockId: String!
+  headerData: InputHeaderData
+  imageData: InputImageData
+  listData: InputListData
+  paragraphData: InputParagraphData
+  sequenceNo: Int!
+  tableData: InputTableData
+  type: BlockType!
+}
+
+input InputHeaderData {
+  level: Int!
+  text: String
+}
+
+input InputImageData {
+  caption: String!
+  filename: String!
+  stretched: Boolean!
+  url: String!
+  withBackground: Boolean!
+  withBorder: Boolean!
+}
+
+input InputListData {
+  items: [String!]!
+  style: ListStyle!
+}
+
+input InputParagraphData {
+  text: String!
+}
+
+input InputTableData {
+  rows: [[String!]!]!
+}
+
+type ListBlock {
+  blockId: String!
+  id: String!
+  items: [ListItem!]!
+  style: ListStyle!
+}
+
+type ListItem {
+  id: String!
+  listId: String!
+  sequenceNo: Int!
+  text: String!
+}
+
+"""The type of list"""
+enum ListStyle {
+  LIST
+  ORDERED
+}
+
+type Member {
+  createdAt: DateTime!
+  deletedAt: DateTime!
+  email: String!
+  firstName: String!
+  id: String!
+  lastName: String!
+  role: Role!
+  status: AccountStatus!
+  username: String!
+}
+
+type Mutation {
+  createArticle(createArticleInput: CreateArticleInput!): Article!
+  createBlock(createBlockInput: CreateBlockInput!): Block!
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  createMember(createMemberInput: CreateMemberInput!): Member!
+  removeArticle(id: Int!): Article!
+  removeBlock(id: Int!): Block!
+  removeComment(id: Int!): Comment!
+  removeMember(id: String!): Member!
+  updateArticle(updateArticleInput: UpdateArticleInput!): Article!
+  updateBlock(updateBlockInput: UpdateBlockInput!): Block!
+  updateComment(updateCommentInput: UpdateCommentInput!): Comment!
+  updateMember(updateMemberInput: UpdateMemberInput!): Member!
+}
+
+type ParagraphBlock {
+  blockId: String!
+  id: String!
+  text: String!
+}
+
+type Query {
+  article(id: Int!): Article!
+  articles: [Article!]!
+  block(id: String!): Block!
+  blocks: [Block!]!
+  comment(id: Int!): Comment!
+  comments: [Comment!]!
+  member(id: String!): Member!
+  members: [Member!]!
+}
+
+"""Member role"""
+enum Role {
+  ADMIN
+  EDITOR
+  MODERATOR
+  SUPERADMIN
+  TRANSLATOR
+  USER
+}
+
+type TableBlock {
+  blockId: String!
+  id: String!
+  rows: [TableRow!]!
+}
+
+type TableRow {
+  id: String!
+  items: [String!]!
+  tableId: String!
+}
+
+input UpdateArticleInput {
+  authorId: String
+  blocks: [InputBlockData!]
+  id: String!
+  publish: Boolean
+}
+
+input UpdateBlockInput {
+  articleId: String
+  blockId: String
+  headerData: InputHeaderData
+  id: String!
+  imageData: InputImageData
+  listData: InputListData
+  paragraphData: InputParagraphData
+  sequenceNo: Float
+  tableData: InputTableData
+  type: BlockType
+}
+
+input UpdateCommentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateMemberInput {
+  email: String
+  firstName: String
+  id: String!
+  lastName: String
+  password: String
+  username: String
+}

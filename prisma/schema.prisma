@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id  String    @id    @default(auto())   @map("_id") @db.ObjectId
+  username      String
+  firstName     String
+  lastName      String
+  email         String
+  password      String
+  role          Role            @default(USER)
+  status        AccountStatus   @default(NORMAL)
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?
+  articles      Article[]
+  comments      Comment[]
+  followedBy    Member[]  @relation("MemberFollows", fields: [followedByIDs], references: [id])
+  followedByIDs String[]  @db.ObjectId
+  following     Member[]      @relation("MemberFollows", fields: [followingIDs], references: [id])
+  followingIDs  String[]  @db.ObjectId
+  @@map("members")
+  @@unique([username, email])
+}
+
+model Article {
+  id            String   @id    @default(auto())   @map("_id") @db.ObjectId
+  blocks        Block[]
+  author        Member    @relation(fields: [authorId], references: [id])
+  authorId      String    @db.ObjectId
+  comments      Comment[]
+  createdAt     DateTime        @default(now())
+  publishedAt   DateTime?
+  @@map("articles")
+}
+
+model Comment {
+  id          String   @id    @default(auto())   @map("_id") @db.ObjectId
+  text        String
+  article     Article   @relation(fields: [articleId], references: [id])
+  articleId   String    @db.ObjectId
+  commenter   Member    @relation(fields: [memberId], references: [id])
+  memberId    String    @db.ObjectId
+  replyTo     String?   @db.ObjectId
+  createdAt   DateTime
+  @@map("comments")
+}
+
+model Block {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  blockId       String
+  type          BlockType     @default(PARAGRAPH)
+  sequenceNo    Int
+  article       Article   @relation(fields: [articleId], references: [id])
+  articleId     String    @db.ObjectId
+  headerData    HeaderBlock?
+  imageData     ImageBlock?
+  listData      ListBlock?
+  paragraphData ParagraphBlock?
+  tableData     TableBlock?
+  @@map("blocks")
+  @@unique([id, blockId])
+}
+
+model HeaderBlock {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  text          String?
+  level         Int?
+  block         Block     @relation(fields: [blockId], references: [id])
+  blockId       String    @db.ObjectId @unique
+  @@map("header-blocks")
+}
+
+model ImageBlock {
+  id              String    @id    @default(auto())   @map("_id") @db.ObjectId
+  caption         String?
+  url             String
+  filename        String
+  stretched       Boolean?
+  withBackground  Boolean?
+  withBorder      Boolean?
+  block           Block     @relation(fields: [blockId], references: [id])
+  blockId         String    @db.ObjectId @unique
+  @@map("image-blocks")
+}
+
+model ListBlock {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  style      ListStyle
+  block         Block     @relation(fields: [blockId], references: [id])
+  blockId       String    @db.ObjectId @unique
+  items         ListItem[]
+  @@map("list-blocks")
+}
+
+model ListItem {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  text          String
+  sequenceNo    Int
+  list          ListBlock   @relation(fields: [listId], references: [id])
+  listId        String      @db.ObjectId
+  @@map("list-items")
+}
+
+model ParagraphBlock {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  text          String
+  block         Block     @relation(fields: [blockId], references: [id])
+  blockId       String    @db.ObjectId @unique
+  @@map("paragraph-blocks")
+}
+
+model TableBlock {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  rows         TableRow[]
+  block         Block     @relation(fields: [blockId], references: [id])
+  blockId       String    @db.ObjectId @unique
+  @@map("table-blocks")
+}
+
+model TableRow {
+  id            String    @id    @default(auto())   @map("_id") @db.ObjectId
+  items         String[]
+  table         TableBlock  @relation(fields: [tableId], references: [id])
+  tableId       String      @db.ObjectId
+  @@map("table-rows")
+}
+
+enum ListStyle {
+  LIST
+  ORDERED
+}
+
+enum BlockType {
+  HEADER
+  PARAGRAPH
+  IMAGE
+  TABLE
+  LIST
+  DELIMITER
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+  TRANSLATOR
+  MODERATOR
+  USER
+}
+
+enum AccountStatus {
+  NORMAL
+  RESTRICTED
+  DEACTIVATED
+}
